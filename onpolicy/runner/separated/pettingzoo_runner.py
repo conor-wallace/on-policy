@@ -123,7 +123,10 @@ class PettingZooRunner(Runner):
         for i in range(self.n_rollout_threads):
             action_env = {}
             for agent_idx, agent in enumerate(self.envs.agents):
-                action_env[agent] = actions[i, agent_idx].squeeze()
+                if self.envs.action_space[agent].__class__.__name__ == 'Box':
+                    action_env[agent] = actions[i, agent_idx].squeeze().clip(-1.0, 1.0)
+                else:
+                    action_env[agent] = actions[i, agent_idx].squeeze()
             actions_env.append(action_env)
 
         return values, actions, action_log_probs, rnn_states, rnn_states_critic, actions_env
